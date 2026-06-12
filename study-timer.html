@@ -47,10 +47,8 @@
     transition: background 0.4s;
     position: relative;
   }
-
   .card.break-mode { background: var(--break-soft); }
 
-  /* Settings gear button */
   .gear-btn {
     position: absolute;
     top: 16px;
@@ -131,10 +129,7 @@
     margin-bottom: 24px;
     letter-spacing: 0.03em;
   }
-  .today-total strong {
-    color: var(--accent);
-    font-weight: 700;
-  }
+  .today-total strong { color: var(--accent); font-weight: 700; }
   .card.break-mode .today-total strong { color: var(--break); }
 
   .btn-row { display: flex; gap: 12px; width: 100%; }
@@ -155,7 +150,6 @@
   .card.break-mode .btn-primary { background: var(--break); }
   .btn-ghost { background: #F0F0EE; color: var(--text); }
 
-  /* Overlay shared */
   .overlay {
     display: none;
     position: fixed;
@@ -174,7 +168,6 @@
     to   { transform: scale(1);    opacity: 1; }
   }
 
-  /* Break popup */
   .popup {
     background: var(--surface);
     border-radius: var(--radius);
@@ -195,7 +188,6 @@
   .btn-yes { background: var(--break); color: #fff; flex: 1.2; }
   .btn-no  { background: #F0F0EE; color: var(--text); flex: 1; }
 
-  /* Settings panel */
   .settings-panel {
     background: var(--surface);
     border-radius: var(--radius);
@@ -204,6 +196,8 @@
     max-width: 360px;
     box-shadow: 0 8px 40px rgba(0,0,0,0.18);
     animation: popIn 0.2s ease;
+    max-height: 90dvh;
+    overflow-y: auto;
   }
   .settings-panel h2 {
     font-size: 17px;
@@ -212,9 +206,7 @@
     text-align: center;
     letter-spacing: 0.01em;
   }
-  .setting-row {
-    margin-bottom: 20px;
-  }
+  .setting-row { margin-bottom: 20px; }
   .setting-label {
     font-size: 12px;
     font-weight: 600;
@@ -224,11 +216,7 @@
     margin-bottom: 10px;
     display: block;
   }
-  .setting-value-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .setting-value-row { display: flex; align-items: center; gap: 12px; }
   .stepper-btn {
     width: 36px;
     height: 36px;
@@ -236,7 +224,6 @@
     border-radius: 10px;
     background: #F0F0EE;
     font-size: 20px;
-    font-weight: 400;
     cursor: pointer;
     display: flex;
     align-items: center;
@@ -246,25 +233,10 @@
     -webkit-tap-highlight-color: transparent;
   }
   .stepper-btn:active { background: #E0E0DC; transform: scale(0.93); }
-  .stepper-val {
-    flex: 1;
-    text-align: center;
-    font-size: 22px;
-    font-weight: 300;
-    font-variant-numeric: tabular-nums;
-  }
-  .stepper-unit {
-    font-size: 12px;
-    color: var(--muted);
-    white-space: nowrap;
-  }
+  .stepper-val { flex: 1; text-align: center; font-size: 22px; font-weight: 300; font-variant-numeric: tabular-nums; }
+  .stepper-unit { font-size: 12px; color: var(--muted); white-space: nowrap; }
 
-  /* Volume slider */
-  .vol-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+  .vol-row { display: flex; align-items: center; gap: 12px; }
   .vol-icon { font-size: 18px; flex-shrink: 0; }
   input[type=range] {
     flex: 1;
@@ -278,29 +250,85 @@
   }
   input[type=range]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 22px;
-    height: 22px;
+    width: 22px; height: 22px;
     border-radius: 50%;
     background: var(--accent);
     cursor: pointer;
     box-shadow: 0 1px 6px rgba(74,124,247,0.35);
   }
   input[type=range]::-moz-range-thumb {
-    width: 22px;
-    height: 22px;
-    border: none;
-    border-radius: 50%;
-    background: var(--accent);
-    cursor: pointer;
+    width: 22px; height: 22px;
+    border: none; border-radius: 50%;
+    background: var(--accent); cursor: pointer;
   }
   .vol-pct { font-size: 13px; color: var(--muted); width: 38px; text-align: right; flex-shrink: 0; }
 
   .divider { height: 1px; background: #F0F0EE; margin: 20px 0; }
 
+  .stat-block {
+    background: #F7F7F5;
+    border-radius: 12px;
+    padding: 14px 16px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .stat-val { font-size: 20px; font-weight: 300; font-variant-numeric: tabular-nums; }
+  .stat-reset {
+    border: none;
+    background: #E8E8E5;
+    border-radius: 8px;
+    font-size: 12px;
+    font-family: inherit;
+    font-weight: 600;
+    padding: 6px 12px;
+    cursor: pointer;
+    color: var(--text);
+    -webkit-tap-highlight-color: transparent;
+  }
+  .stat-reset:active { opacity: 0.7; }
+
   .settings-btns { display: flex; gap: 10px; margin-top: 4px; }
   .settings-btns .btn { font-size: 15px; padding: 14px 0; }
   .btn-save { background: var(--accent); color: #fff; }
   .btn-cancel { background: #F0F0EE; color: var(--text); }
+
+  .toggle-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .toggle-desc { font-size: 14px; color: var(--text); line-height: 1.4; }
+  .toggle-desc small { display: block; font-size: 11px; color: var(--muted); margin-top: 2px; }
+  .toggle {
+    position: relative;
+    width: 48px;
+    height: 28px;
+    flex-shrink: 0;
+  }
+  .toggle input { opacity: 0; width: 0; height: 0; }
+  .toggle-track {
+    position: absolute;
+    inset: 0;
+    background: #DDD;
+    border-radius: 28px;
+    transition: background 0.2s;
+    cursor: pointer;
+  }
+  .toggle-track::after {
+    content: '';
+    position: absolute;
+    top: 3px; left: 3px;
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+    transition: transform 0.2s;
+  }
+  .toggle input:checked + .toggle-track { background: var(--break); }
+  .toggle input:checked + .toggle-track::after { transform: translateX(20px); }
 </style>
 </head>
 <body>
@@ -327,7 +355,7 @@
     <div class="dot" id="d3"></div>
   </div>
 
-  <div class="today-total">今日の勉強時間：<strong id="todayDisplay">0分</strong></div>
+  <div class="today-total">今日の勉強時間：<strong id="todayDisplay">0秒</strong></div>
 
   <div class="btn-row">
     <button class="btn btn-ghost" id="resetBtn" onclick="resetTimer()">リセット</button>
@@ -394,10 +422,34 @@
     <div class="divider"></div>
 
     <div class="setting-row">
+      <span class="setting-label">今日の勉強時間</span>
+      <div class="stat-block">
+        <span class="stat-val" id="todayAllDisplay">0秒</span>
+        <button class="stat-reset" onclick="confirmResetToday()">リセット</button>
+      </div>
+    </div>
+
+    <div class="setting-row">
       <span class="setting-label">累計勉強時間（全期間）</span>
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:12px;">
-        <span id="totalAllDisplay" style="font-size:22px;font-weight:300;font-variant-numeric:tabular-nums;">0分</span>
-        <button class="btn btn-ghost" style="flex:0 0 auto;font-size:13px;padding:8px 14px;border-radius:10px;" onclick="confirmResetAll()">リセット</button>
+      <div class="stat-block">
+        <span class="stat-val" id="totalAllDisplay">0秒</span>
+        <button class="stat-reset" onclick="confirmResetAll()">リセット</button>
+      </div>
+    </div>
+
+
+    <div class="divider"></div>
+
+    <div class="setting-row">
+      <div class="toggle-row">
+        <div class="toggle-desc">
+          休憩から始める
+          <small>スタート時に休憩タイマーから開始する</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="breakFirstToggle" onchange="tmpBreakFirst = this.checked">
+          <span class="toggle-track"></span>
+        </label>
       </div>
     </div>
 
@@ -412,26 +464,26 @@
   const CIRCUMFERENCE = 2 * Math.PI * 90;
   const POPUP_WAIT = 10;
 
-  // ---- Persistent storage ----
+  // ---- Persistent storage: stats ----
   function todayKey() {
     const d = new Date();
     return `study_day_${d.getFullYear()}_${d.getMonth()}_${d.getDate()}`;
   }
-  function loadTodaySec() {
-    return parseInt(localStorage.getItem(todayKey()) || '0', 10);
+  function loadTodaySec()  { return parseInt(localStorage.getItem(todayKey()) || '0', 10); }
+  function addTodaySec(s)  { localStorage.setItem(todayKey(), loadTodaySec() + s); }
+  function loadTotalSec()  { return parseInt(localStorage.getItem('study_total_sec') || '0', 10); }
+  function addTotalSec(s)  { localStorage.setItem('study_total_sec', loadTotalSec() + s); }
+  function confirmResetToday() {
+    if (confirm('今日の勉強時間をリセットしますか？')) {
+      localStorage.setItem(todayKey(), '0');
+      renderStats();
+    }
   }
-  function addTodaySec(s) {
-    localStorage.setItem(todayKey(), loadTodaySec() + s);
-  }
-  function loadTotalSec() {
-    return parseInt(localStorage.getItem('study_total_sec') || '0', 10);
-  }
-  function addTotalSec(s) {
-    localStorage.setItem('study_total_sec', loadTotalSec() + s);
-  }
-  function resetAllTotal() {
-    localStorage.setItem('study_total_sec', '0');
-    renderStats();
+  function confirmResetAll() {
+    if (confirm('累計勉強時間をリセットしますか？')) {
+      localStorage.setItem('study_total_sec', '0');
+      renderStats();
+    }
   }
   function fmtDuration(sec) {
     const h = Math.floor(sec / 3600);
@@ -442,68 +494,84 @@
     return `${s}秒`;
   }
   function renderStats() {
-    document.getElementById('todayDisplay').textContent = fmtDuration(loadTodaySec());
-    const el = document.getElementById('totalAllDisplay');
-    if (el) el.textContent = fmtDuration(loadTotalSec());
-  }
-  function confirmResetAll() {
-    if (confirm('累計勉強時間をリセットしますか？')) resetAllTotal();
+    const today = fmtDuration(loadTodaySec());
+    document.getElementById('todayDisplay').textContent = today;
+    const tEl = document.getElementById('todayAllDisplay');
+    if (tEl) tEl.textContent = today;
+    const aEl = document.getElementById('totalAllDisplay');
+    if (aEl) aEl.textContent = fmtDuration(loadTotalSec());
   }
 
-  // Settings state
+  // ---- Timer state persistence ----
+  function saveState() {
+    localStorage.setItem('timer_state', JSON.stringify({
+      studyMin, breakMin, tickVol, breakFirst,
+      remaining, totalSec, isBreak, sessionsDone
+    }));
+  }
+  function loadState() {
+    try {
+      const raw = localStorage.getItem('timer_state');
+      if (!raw) return;
+      const s = JSON.parse(raw);
+      studyMin     = s.studyMin     ?? 25;
+      breakMin     = s.breakMin     ?? 5;
+      tickVol      = s.tickVol      ?? 0.4;
+      breakFirst   = s.breakFirst   ?? false;
+      isBreak      = s.isBreak      ?? false;
+      sessionsDone = s.sessionsDone ?? 0;
+      studySec     = studyMin * 60;
+      breakSec     = breakMin * 60;
+      totalSec     = s.totalSec     ?? studySec;
+      remaining    = Math.max(0, Math.min(s.remaining ?? studySec, totalSec));
+    } catch(e) {}
+  }
+
+  // ---- State variables (defaults, overwritten by loadState) ----
   let studyMin  = 25;
   let breakMin  = 5;
   let tickVol   = 0.4;
-
-  // Timer state
-  let studySec     = studyMin * 60;
-  let breakSec     = breakMin * 60;
-  let totalSec     = studySec;
-  let remaining    = studySec;
-  let isRunning    = false;
-  let isBreak      = false;
+  let breakFirst = false;
+  let studySec  = studyMin * 60;
+  let breakSec  = breakMin * 60;
+  let totalSec  = studySec;
+  let remaining = studySec;
+  let isRunning = false;
+  let isBreak   = false;
   let sessionsDone = 0;
-  let timerId      = null;
-  let popupTimer   = null;
+  let timerId   = null;
+  let popupTimer = null;
 
-  // Temp settings (while panel open)
+  // Temp settings
   let tmpStudy = studyMin;
   let tmpBreak = breakMin;
   let tmpVol   = Math.round(tickVol * 100);
+  let tmpBreakFirst = breakFirst;
 
-  // AudioContext
+  // ---- Audio ----
   let audioCtx = null;
-
   function getAudioCtx() {
     if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
     return audioCtx;
   }
-
   function playTick(volume) {
     try {
       const ctx = getAudioCtx();
       const t = ctx.currentTime;
       const dur = 0.012;
-
-      // ノイズバースト（機械的なカチッ）
       const bufLen = Math.ceil(ctx.sampleRate * dur);
       const buf = ctx.createBuffer(1, bufLen, ctx.sampleRate);
       const data = buf.getChannelData(0);
       for (let i = 0; i < bufLen; i++) data[i] = (Math.random() * 2 - 1);
-
       const noise = ctx.createBufferSource();
       noise.buffer = buf;
-
-      // バンドパスフィルター：2kHz付近を強調→金属的なカチッ感
       const bp = ctx.createBiquadFilter();
       bp.type = 'bandpass';
       bp.frequency.value = 2200;
       bp.Q.value = 0.8;
-
       const gainNode = ctx.createGain();
       gainNode.gain.setValueAtTime(volume * 2.5, t);
       gainNode.gain.exponentialRampToValueAtTime(0.001, t + dur);
-
       noise.connect(bp);
       bp.connect(gainNode);
       gainNode.connect(ctx.destination);
@@ -511,25 +579,24 @@
       noise.stop(t + dur);
     } catch(e) {}
   }
-
   function playTestTick() { playTick(tickVol); }
 
-  // DOM refs
-  const card         = document.getElementById('card');
-  const modeLabel    = document.getElementById('modeLabel');
-  const timeDisplay  = document.getElementById('timeDisplay');
-  const timeSub      = document.getElementById('timeSub');
-  const ring         = document.getElementById('ringProgress');
-  const startBtn     = document.getElementById('startBtn');
-  const overlay      = document.getElementById('overlay');
-  const countdownBar = document.getElementById('countdownBar');
-  const popupBody    = document.getElementById('popupBody');
-  const breakYesBtn  = document.getElementById('breakYesBtn');
+  // ---- DOM refs ----
+  const card            = document.getElementById('card');
+  const modeLabel       = document.getElementById('modeLabel');
+  const timeDisplay     = document.getElementById('timeDisplay');
+  const timeSub         = document.getElementById('timeSub');
+  const ring            = document.getElementById('ringProgress');
+  const startBtn        = document.getElementById('startBtn');
+  const overlay         = document.getElementById('overlay');
+  const countdownBar    = document.getElementById('countdownBar');
+  const popupBody       = document.getElementById('popupBody');
+  const breakYesBtn     = document.getElementById('breakYesBtn');
   const settingsOverlay = document.getElementById('settingsOverlay');
-  const studyValEl   = document.getElementById('studyVal');
-  const breakValEl   = document.getElementById('breakVal');
-  const volSlider    = document.getElementById('volSlider');
-  const volPct       = document.getElementById('volPct');
+  const studyValEl      = document.getElementById('studyVal');
+  const breakValEl      = document.getElementById('breakVal');
+  const volSlider       = document.getElementById('volSlider');
+  const volPct          = document.getElementById('volPct');
 
   ring.style.strokeDasharray = CIRCUMFERENCE;
 
@@ -538,18 +605,24 @@
     const sec = s % 60;
     return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
   }
-
   function updateRing() {
-    const offset = CIRCUMFERENCE * (1 - remaining / totalSec);
-    ring.style.strokeDashoffset = offset;
+    ring.style.strokeDashoffset = CIRCUMFERENCE * (1 - remaining / totalSec);
   }
-
   function updateDots() {
-    for (let i = 0; i < 4; i++) {
+    for (let i = 0; i < 4; i++)
       document.getElementById('d' + i).classList.toggle('done', i < sessionsDone);
+  }
+  function applyBreakMode() {
+    if (isBreak) {
+      card.classList.add('break-mode');
+      modeLabel.textContent = '休憩中';
+      timeSub.textContent   = '休憩残り';
+    } else {
+      card.classList.remove('break-mode');
+      modeLabel.textContent = '勉強中';
+      timeSub.textContent   = '残り時間';
     }
   }
-
   function render() {
     timeDisplay.textContent = fmt(remaining);
     updateRing();
@@ -560,6 +633,7 @@
       clearInterval(timerId);
       isRunning = false;
       startBtn.textContent = 'スタート';
+      saveState();
       if (!isBreak) {
         sessionsDone = Math.min(sessionsDone + 1, 4);
         updateDots();
@@ -569,166 +643,4 @@
       }
       return;
     }
-    remaining--;
-    render();
-    if (!isBreak) {
-      addTodaySec(1);
-      addTotalSec(1);
-      renderStats();
-    }
-    if (tickVol > 0) playTick(tickVol);
-  }
-
-  function startTimer() {
-    isRunning = true;
-    startBtn.textContent = '一時停止';
-    timerId = setInterval(tick, 1000);
-  }
-
-  function toggleTimer() {
-    if (isRunning) {
-      clearInterval(timerId);
-      isRunning = false;
-      startBtn.textContent = 'スタート';
-    } else {
-      // Unlock AudioContext on first user gesture
-      if (!audioCtx) getAudioCtx();
-      startTimer();
-    }
-  }
-
-  function resetTimer() {
-    clearInterval(timerId);
-    clearInterval(popupTimer);
-    isRunning = false;
-    isBreak   = false;
-    remaining = studySec;
-    totalSec  = studySec;
-    sessionsDone = 0;
-    card.classList.remove('break-mode');
-    overlay.classList.remove('show');
-    modeLabel.textContent = '勉強中';
-    timeSub.textContent   = '残り時間';
-    startBtn.textContent  = 'スタート';
-    updateDots();
-    render();
-  }
-
-  function showPopup() {
-    popupBody.innerHTML = `${studyMin}分間よく頑張ったね。<br>休憩する？`;
-    breakYesBtn.textContent = `はい（${breakMin}分休憩）`;
-    overlay.classList.add('show');
-    countdownBar.style.transition = 'none';
-    countdownBar.style.width = '100%';
-    countdownBar.getBoundingClientRect();
-    countdownBar.style.transition = `width ${POPUP_WAIT}s linear`;
-    countdownBar.style.width = '0%';
-
-    let left = POPUP_WAIT;
-    popupTimer = setInterval(() => {
-      left--;
-      if (left <= 0) {
-        clearInterval(popupTimer);
-        overlay.classList.remove('show');
-        continueStudy();
-      }
-    }, 1000);
-  }
-
-  function startBreak() {
-    clearInterval(popupTimer);
-    overlay.classList.remove('show');
-    isBreak   = true;
-    totalSec  = breakSec;
-    remaining = breakSec;
-    card.classList.add('break-mode');
-    modeLabel.textContent = '休憩中';
-    timeSub.textContent   = '休憩残り';
-    render();
-    startTimer();
-  }
-
-  function endBreak() {
-    isBreak = false;
-    card.classList.remove('break-mode');
-    remaining = studySec;
-    totalSec  = studySec;
-    modeLabel.textContent = '勉強中';
-    timeSub.textContent   = '残り時間';
-    render();
-    startTimer();
-  }
-
-  function continueStudy() {
-    clearInterval(popupTimer);
-    overlay.classList.remove('show');
-    isBreak   = false;
-    totalSec  = studySec;
-    remaining = studySec;
-    card.classList.remove('break-mode');
-    modeLabel.textContent = '勉強中';
-    timeSub.textContent   = '残り時間';
-    render();
-    startTimer();
-  }
-
-  // ---- Settings ----
-  function openSettings() {
-    if (isRunning) return; // don't open while running
-    tmpStudy = studyMin;
-    tmpBreak = breakMin;
-    tmpVol   = Math.round(tickVol * 100);
-    studyValEl.textContent = tmpStudy;
-    breakValEl.textContent = tmpBreak;
-    volSlider.value = tmpVol;
-    volPct.textContent = tmpVol + '%';
-    settingsOverlay.classList.add('show');
-    renderStats();
-
-    const gear = document.getElementById('gearBtn');
-    gear.classList.add('spinning');
-    setTimeout(() => gear.classList.remove('spinning'), 400);
-  }
-
-  function closeSettings() {
-    settingsOverlay.classList.remove('show');
-  }
-
-  function saveSettings() {
-    studyMin = tmpStudy;
-    breakMin = tmpBreak;
-    tickVol  = tmpVol / 100;
-    studySec = studyMin * 60;
-    breakSec = breakMin * 60;
-
-    // Apply immediately if not running
-    if (!isRunning && !isBreak) {
-      remaining = studySec;
-      totalSec  = studySec;
-      render();
-    }
-    closeSettings();
-  }
-
-  function step(type, delta) {
-    if (type === 'study') {
-      tmpStudy = Math.max(1, Math.min(120, tmpStudy + delta));
-      studyValEl.textContent = tmpStudy;
-    } else {
-      tmpBreak = Math.max(1, Math.min(60, tmpBreak + delta));
-      breakValEl.textContent = tmpBreak;
-    }
-  }
-
-  function onVolChange(val) {
-    tmpVol = parseInt(val);
-    volPct.textContent = tmpVol + '%';
-  }
-
-  // init
-  render();
-  updateDots();
-  renderStats();
-</script>
-</body>
-</html>
+    rem
