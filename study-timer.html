@@ -1944,6 +1944,9 @@
     updateQuietHoursRowVisibility();
   }
   function saveSettings() {
+    const oldStudySec = studySec;
+    const oldBreakSec = breakSec;
+
     studyMin   = tmpStudy;
     breakMin   = tmpBreak;
     tickVol    = tmpVol / 100;
@@ -1966,13 +1969,18 @@
     else if (isBreak && isRunning && !timerEndsAt) timerEndsAt = Date.now() + remaining * 1000;
     studySec   = studyMin * 60;
     breakSec   = breakMin * 60;
-    if (!isRunning) {
-      isBreak   = breakFirst;
-      remaining = breakFirst ? breakSec : studySec;
-      totalSec  = breakFirst ? breakSec : studySec;
-      applyBreakMode();
+
+    // 今のフェーズ（勉強 or 休憩）の時間設定が実際に変わった場合のみ、残り時間を更新する
+    const oldCurrentTotal = isBreak ? oldBreakSec : oldStudySec;
+    const newCurrentTotal = isBreak ? breakSec : studySec;
+    if (newCurrentTotal !== oldCurrentTotal) {
+      remaining = (remaining === oldCurrentTotal)
+        ? newCurrentTotal
+        : Math.min(remaining, newCurrentTotal);
+      totalSec = newCurrentTotal;
       render();
     }
+
     renderStats();
     saveState();
     closeSettings();
