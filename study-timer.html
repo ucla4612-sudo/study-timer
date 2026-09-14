@@ -922,7 +922,7 @@
         <span class="vol-pct" id="volPct">40%</span>
       </div>
       <div style="margin-top:10px;">
-        <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:10px 0;" onclick="playTestTick()">🎵 ティックをテスト</button>
+        <button class="btn btn-ghost" id="tickTestBtn" style="width:100%;font-size:14px;padding:10px 0;" onclick="toggleTickTest()">🎵 ティックをテスト</button>
       </div>
     </div>
 
@@ -938,7 +938,7 @@
         <span class="vol-icon">🔊</span>
         <span class="vol-pct" id="bellVolPct">70%</span>
       </div>
-      <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:10px 0;" onclick="playTestBell()">▶ ベルをテスト</button>
+      <button class="btn btn-ghost" id="bellTestBtn" style="width:100%;font-size:14px;padding:10px 0;" onclick="toggleBellTest()">▶ ベルをテスト</button>
     </div>
 
     <div class="setting-row">
@@ -1456,7 +1456,21 @@
       tickIsHigh = !tickIsHigh;
     } catch(e) {}
   }
-  function playTestTick() { playTick(tmpVol / 100); }
+  let tickTestTimer = null;
+  function toggleTickTest() {
+    const btn = document.getElementById('tickTestBtn');
+    if (tickTestTimer) {
+      clearInterval(tickTestTimer);
+      tickTestTimer = null;
+      btn.textContent = '🎵 ティックをテスト';
+      return;
+    }
+    if (!audioCtx) getAudioCtx();
+    playTick(tmpVol / 100);
+    // 実際のタイマーと同じ、1秒間隔のテンポでループ再生
+    tickTestTimer = setInterval(() => playTick(tmpVol / 100), 1000);
+    btn.textContent = '■ テストを止める';
+  }
 
   // ---- 通知 & バイブレーション ----
   function requestNotificationPermission() {
@@ -1515,10 +1529,14 @@
     } catch(e) {}
   }
 
-  function playBellSoft(volume) {
+  function playBellSoft(volume, destNode) {
     try {
       const ctx = getAudioCtx();
       const t = ctx.currentTime;
+      const out = destNode || ctx.destination;
+      // destNode が渡された場合（テスト再生中）は音量をそちら側のGainNodeで
+      // リアルタイムに制御するので、ここでは固定の相対振幅だけを使う
+      const vol = destNode ? 1 : volume;
       // 3回ベルを鳴らす（優しい音）
       for (let i = 0; i < 3; i++) {
         const osc = ctx.createOscillator();
@@ -1530,19 +1548,19 @@
 
         osc.type = 'sine';
         osc.frequency.setValueAtTime(880, start);
-        gain.gain.setValueAtTime(volume * 0.7, start);
+        gain.gain.setValueAtTime(vol * 0.7, start);
         gain.gain.exponentialRampToValueAtTime(0.001, start + dur);
         osc.connect(gain);
-        gain.connect(ctx.destination);
+        gain.connect(out);
         osc.start(start);
         osc.stop(start + dur);
 
         osc2.type = 'sine';
         osc2.frequency.setValueAtTime(1108, start);
-        gain2.gain.setValueAtTime(volume * 0.4, start);
+        gain2.gain.setValueAtTime(vol * 0.4, start);
         gain2.gain.exponentialRampToValueAtTime(0.001, start + dur);
         osc2.connect(gain2);
-        gain2.connect(ctx.destination);
+        gain2.connect(out);
         osc2.start(start);
         osc2.stop(start + dur);
       }
@@ -1554,14 +1572,62 @@
     if (bellStyle === 'soft') playBellSoft(volume);
     else playBellCustom(volume); // 'classic' = アップロードされた目覚まし音声
   }
-  function playTestBell() {
-    if (tmpBellStyle === 'soft') playBellSoft(tmpBellVol / 100);
-    else playBellCustom(tmpBellVol / 100);
+  let bellTestTimer = null;  // 'soft' スタイルのループ用インターバル
+  let bellTestAudio = null;  // 'classic' スタイル再生中のaudio要素（ループ再生＋音量を直接更新するため）
+  let bellTestGain  = null;  // 'soft' スタイル再生中、音量をリアルタイムに反映するためのGainNode
+  function isTestAudioActive() {
+    return !!(tickTestTimer || bellTestTimer || bellTestAudio);
+  }
+  function toggleBellTest() {
+    const btn = document.getElementById('bellTestBtn');
+    if (bellTestTimer || bellTestAudio) {
+      stopBellTest();
+      btn.textContent = '▶ ベルをテスト';
+      return;
+    }
+    const ctx = getAudioCtx();
+    if (tmpBellStyle === 'soft') {
+      bellTestGain = ctx.createGain();
+      bellTestGain.gain.value = tmpBellVol / 100;
+      bellTestGain.connect(ctx.destination);
+      playBellSoft(null, bellTestGain);
+      // 「優しいベル」の1回分の長さ（約1.65秒）に合わせてループ
+      bellTestTimer = setInterval(() => playBellSoft(null, bellTestGain), 1650);
+    } else {
+      const audio = getCustomAlarmAudio();
+      audio.loop = true;
+      audio.currentTime = 0;
+      audio.volume = tmpBellVol / 100;
+      audio.play().catch(()=>{});
+      bellTestAudio = audio;
+    }
+    btn.textContent = '■ テストを止める';
+  }
+  function stopBellTest() {
+    if (bellTestTimer) {
+      clearInterval(bellTestTimer);
+      bellTestTimer = null;
+    }
+    if (bellTestGain) {
+      try { bellTestGain.disconnect(); } catch(e) {}
+      bellTestGain = null;
+    }
+    if (bellTestAudio) {
+      bellTestAudio.loop = false;
+      bellTestAudio.pause();
+      bellTestAudio.currentTime = 0;
+      bellTestAudio = null;
+    }
   }
   function selectBellStyle(style) {
     tmpBellStyle = style;
     document.getElementById('bellStyleSoftBtn').classList.toggle('active', style === 'soft');
     document.getElementById('bellStyleClassicBtn').classList.toggle('active', style === 'classic');
+    // テスト再生中にスタイルを切り替えたら、新しいスタイルでループを再開する
+    if (bellTestTimer || bellTestAudio) {
+      stopBellTest();
+      toggleBellTest();
+    }
   }
 
   function showExtendPanel() {
@@ -1707,7 +1773,7 @@
         if (longBreakEnabled && sessionsDone % 4 === 0) longBreakPending = true;
         updateDots();
         isExtension = false;
-        if (!isQuietHoursNow()) playBell(bellVol);
+        if (!isQuietHoursNow() && !isTestAudioActive()) playBell(bellVol);
         notifyAndVibrate('時間です！⏰', '勉強時間が終わりました。休憩する？');
         showPopup();
       } else {
@@ -1728,7 +1794,7 @@
     }
     render();
     saveState();
-    if (tickVol > 0 && !isQuietHoursNow()) playTick(tickVol);
+    if (tickVol > 0 && !isQuietHoursNow() && !isTestAudioActive()) playTick(tickVol);
   }
 
   function startTimer() {
@@ -1819,7 +1885,7 @@
     timerEndsAt = null;
     if (longBreakPending) longBreakPending = false; // 長め休憩を取り終えたのでリセット
     if (!skipReady) {
-      if (!isQuietHoursNow()) playBell(bellVol);
+      if (!isQuietHoursNow() && !isTestAudioActive()) playBell(bellVol);
       notifyAndVibrate('休憩終了！🎯', '準備ができたらタイマーを再開しよう。');
     }
     isBreak   = false;
@@ -1914,6 +1980,12 @@
   }
   function closeSettings() {
     settingsOverlay.classList.remove('show');
+    if (tickTestTimer) { clearInterval(tickTestTimer); tickTestTimer = null; }
+    const tickBtn = document.getElementById('tickTestBtn');
+    if (tickBtn) tickBtn.textContent = '🎵 ティックをテスト';
+    stopBellTest();
+    const bellBtn = document.getElementById('bellTestBtn');
+    if (bellBtn) bellBtn.textContent = '▶ ベルをテスト';
   }
   function confirmResetSettings() {
     if (!confirm('設定を初期状態に戻しますか？\n（勉強記録は消えません。保存ボタンを押すまで確定しません）')) return;
@@ -2020,6 +2092,8 @@
   function onBellVolChange(val) {
     tmpBellVol = parseInt(val);
     document.getElementById('bellVolPct').textContent = tmpBellVol + '%';
+    if (bellTestAudio) bellTestAudio.volume = tmpBellVol / 100;
+    if (bellTestGain) bellTestGain.gain.value = tmpBellVol / 100;
   }
 
   // ---- Init ----
