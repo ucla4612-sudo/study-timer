@@ -941,7 +941,6 @@
         <span class="stat-val" id="notifyStatusVal" style="font-size:14px;">確認中…</span>
         <button class="stat-reset" onclick="requestNotificationPermissionManual()">許可する</button>
       </div>
-      <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:10px 0;margin-bottom:10px;" onclick="testNotification()">🔔 テスト通知を送る</button>
       <small style="color:var(--muted);font-size:11px;line-height:1.5;display:block;">
         勉強・休憩が終わった時に通知とバイブでお知らせします。「ブロック」になっている場合はブラウザの設定から許可してください。
       </small>
@@ -1090,12 +1089,9 @@
     return streak;
   }
   function renderStreak() {
-    const badge = document.getElementById('streakBadge');
-    if (!streakEnabled) {
-      badge.style.display = 'none';
-      return;
-    }
+    if (!streakEnabled) return;
     const streak = calcStreak();
+    const badge = document.getElementById('streakBadge');
     const val = document.getElementById('streakVal');
     if (streak > 0) {
       badge.style.display = 'inline-flex';
@@ -1493,21 +1489,6 @@
       } catch(e) {}
     }
   }
-  function testNotification() {
-    if (!('Notification' in window)) {
-      alert('このブラウザは通知に対応していません。');
-      return;
-    }
-    if (Notification.permission === 'denied') {
-      alert('通知がブロックされています。ブラウザの設定から許可してください。');
-      return;
-    }
-    if (Notification.permission !== 'granted') {
-      alert('まだ通知が許可されていません。「許可する」ボタンを先に押してください。');
-      return;
-    }
-    notifyAndVibrate('🔔 テスト通知', 'これはテスト通知です。問題なく届いています！');
-  }
 
   let customAlarmAudio = null;
   function getCustomAlarmAudio() {
@@ -1757,6 +1738,7 @@
       if (isBreak) return; // 休憩中は一時停止できない
       clearInterval(timerId);
       isRunning = false;
+      timerEndsAt = null;
       updateStartBtnState();
       updateModeLabel();
       render();
