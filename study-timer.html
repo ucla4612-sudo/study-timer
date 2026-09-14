@@ -932,6 +932,12 @@
         <button class="btn btn-ghost" id="bellStyleSoftBtn" style="flex:1;font-size:13px;padding:10px 4px;" onclick="selectBellStyle('soft')">🔔 優しいベル</button>
         <button class="btn btn-ghost" id="bellStyleClassicBtn" style="flex:1;font-size:13px;padding:10px 4px;" onclick="selectBellStyle('classic')">⏰ 目覚まし</button>
       </div>
+      <div class="vol-row" style="margin-bottom:10px;">
+        <span class="vol-icon">🔇</span>
+        <input type="range" id="bellVolSlider" min="0" max="100" value="70" oninput="onBellVolChange(this.value)">
+        <span class="vol-icon">🔊</span>
+        <span class="vol-pct" id="bellVolPct">70%</span>
+      </div>
       <button class="btn btn-ghost" style="width:100%;font-size:14px;padding:10px 0;" onclick="playTestBell()">▶ ベルをテスト</button>
     </div>
 
@@ -1308,7 +1314,7 @@
   function saveState() {
     localStorage.setItem('timer_state', JSON.stringify({
       studyMin, breakMin, tickVol, breakFirst, popupWaitSec,
-      remaining, totalSec, isBreak, sessionsDone, timerEndsAt, isRunning, bgTracking, studyBgTracking, bellStyle, longBreakPending, longBreakEnabled, isExtension, extensionAccumSec,
+      remaining, totalSec, isBreak, sessionsDone, timerEndsAt, isRunning, bgTracking, studyBgTracking, bellStyle, bellVol, longBreakPending, longBreakEnabled, isExtension, extensionAccumSec,
       goalEnabled, goalMin, streakEnabled, quietHoursEnabled, quietStart, quietEnd
     }));
   }
@@ -1337,6 +1343,7 @@
       bgTracking   = s.bgTracking   ?? true;
       studyBgTracking = s.studyBgTracking ?? false;
       bellStyle    = s.bellStyle    ?? 'classic';
+      bellVol      = s.bellVol      ?? 0.7;
       goalEnabled  = s.goalEnabled  ?? false;
       goalMin      = s.goalMin      ?? 60;
       streakEnabled = s.streakEnabled ?? false;
@@ -1374,6 +1381,7 @@
     return isBreak ? bgTracking : studyBgTracking;
   }
   let bellStyle = 'classic'; // 'soft' または 'classic'
+  let bellVol = 0.7; // ベル音量（ティック音量とは独立）
   let goalEnabled = false; // 目標設定機能のオン/オフ
   let goalMin = 60; // 今日の目標勉強時間（分）
   let streakEnabled = false; // 連続記録（ストリーク）表示のオン/オフ
@@ -1391,6 +1399,7 @@
   let tmpStudyBgTracking = studyBgTracking;
   let tmpLongBreakEnabled = longBreakEnabled;
   let tmpBellStyle = bellStyle;
+  let tmpBellVol = Math.round(bellVol * 100);
   let tmpGoalEnabled = goalEnabled;
   let tmpGoalMin = goalMin;
   let tmpStreakEnabled = streakEnabled;
@@ -1546,8 +1555,8 @@
     else playBellCustom(volume); // 'classic' = アップロードされた目覚まし音声
   }
   function playTestBell() {
-    if (tmpBellStyle === 'soft') playBellSoft(tmpVol / 100);
-    else playBellCustom(tmpVol / 100);
+    if (tmpBellStyle === 'soft') playBellSoft(tmpBellVol / 100);
+    else playBellCustom(tmpBellVol / 100);
   }
   function selectBellStyle(style) {
     tmpBellStyle = style;
@@ -1698,7 +1707,7 @@
         if (longBreakEnabled && sessionsDone % 4 === 0) longBreakPending = true;
         updateDots();
         isExtension = false;
-        if (!isQuietHoursNow()) playBell(tickVol > 0 ? Math.max(tickVol, 0.5) : 0.5);
+        if (!isQuietHoursNow()) playBell(bellVol);
         notifyAndVibrate('時間です！⏰', '勉強時間が終わりました。休憩する？');
         showPopup();
       } else {
@@ -1810,7 +1819,7 @@
     timerEndsAt = null;
     if (longBreakPending) longBreakPending = false; // 長め休憩を取り終えたのでリセット
     if (!skipReady) {
-      if (!isQuietHoursNow()) playBell(tickVol > 0 ? Math.max(tickVol, 0.5) : 0.5);
+      if (!isQuietHoursNow()) playBell(bellVol);
       notifyAndVibrate('休憩終了！🎯', '準備ができたらタイマーを再開しよう。');
     }
     isBreak   = false;
@@ -1853,7 +1862,6 @@
 
   // ---- Settings ----
   function openSettings() {
-    if (isRunning) return;
     tmpStudy = studyMin;
     tmpBreak = breakMin;
     tmpVol   = Math.round(tickVol * 100);
@@ -1874,6 +1882,9 @@
     tmpBellStyle = bellStyle;
     document.getElementById('bellStyleSoftBtn').classList.toggle('active', bellStyle === 'soft');
     document.getElementById('bellStyleClassicBtn').classList.toggle('active', bellStyle === 'classic');
+    tmpBellVol = Math.round(bellVol * 100);
+    document.getElementById('bellVolSlider').value = tmpBellVol;
+    document.getElementById('bellVolPct').textContent = tmpBellVol + '%';
     tmpGoalEnabled = goalEnabled;
     document.getElementById('goalEnabledToggle').checked = goalEnabled;
     tmpGoalMin = goalMin;
@@ -1916,6 +1927,7 @@
     tmpStudyBgTracking = false;
     tmpLongBreakEnabled = true;
     tmpBellStyle = 'classic';
+    tmpBellVol = 70;
     tmpGoalEnabled = false;
     tmpGoalMin = 60;
     tmpStreakEnabled = false;
@@ -1934,6 +1946,8 @@
     document.getElementById('longBreakToggle').checked = tmpLongBreakEnabled;
     document.getElementById('bellStyleSoftBtn').classList.toggle('active', tmpBellStyle === 'soft');
     document.getElementById('bellStyleClassicBtn').classList.toggle('active', tmpBellStyle === 'classic');
+    document.getElementById('bellVolSlider').value = tmpBellVol;
+    document.getElementById('bellVolPct').textContent = tmpBellVol + '%';
     document.getElementById('goalEnabledToggle').checked = tmpGoalEnabled;
     document.getElementById('goalVal').textContent = tmpGoalMin;
     document.getElementById('streakEnabledToggle').checked = tmpStreakEnabled;
@@ -1944,8 +1958,9 @@
     updateQuietHoursRowVisibility();
   }
   function saveSettings() {
-    const oldStudySec = studySec;
-    const oldBreakSec = breakSec;
+    const oldStudyMin = studyMin;
+    const oldBreakMin = breakMin;
+    const oldBreakFirst = breakFirst;
 
     studyMin   = tmpStudy;
     breakMin   = tmpBreak;
@@ -1959,6 +1974,7 @@
     longBreakEnabled = tmpLongBreakEnabled;
     if (!longBreakEnabled) longBreakPending = false;
     bellStyle = tmpBellStyle;
+    bellVol = tmpBellVol / 100;
     goalEnabled = tmpGoalEnabled;
     goalMin = tmpGoalMin;
     streakEnabled = tmpStreakEnabled;
@@ -1970,20 +1986,17 @@
     studySec   = studyMin * 60;
     breakSec   = breakMin * 60;
 
-    // 今のフェーズ（勉強 or 休憩）の時間設定が実際に変わった場合のみ、残り時間を更新する
-    const oldCurrentTotal = isBreak ? oldBreakSec : oldStudySec;
-    const newCurrentTotal = isBreak ? breakSec : studySec;
-    if (newCurrentTotal !== oldCurrentTotal) {
-      remaining = (remaining === oldCurrentTotal)
-        ? newCurrentTotal
-        : Math.min(remaining, newCurrentTotal);
-      totalSec = newCurrentTotal;
-      render();
+    renderStats();
+    closeSettings();
+
+    // 勉強時間・休憩時間・休憩から始めるの設定が変わった時だけタイマーをリセットする
+    const timeSettingsChanged = studyMin !== oldStudyMin || breakMin !== oldBreakMin || breakFirst !== oldBreakFirst;
+    if (timeSettingsChanged) {
+      resetTimer();
+      return;
     }
 
-    renderStats();
     saveState();
-    closeSettings();
   }
   function step(type, delta) {
     if (type === 'study') {
@@ -2003,6 +2016,10 @@
   function onVolChange(val) {
     tmpVol = parseInt(val);
     volPct.textContent = tmpVol + '%';
+  }
+  function onBellVolChange(val) {
+    tmpBellVol = parseInt(val);
+    document.getElementById('bellVolPct').textContent = tmpBellVol + '%';
   }
 
   // ---- Init ----
